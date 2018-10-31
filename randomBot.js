@@ -1,40 +1,57 @@
 class RandomBot {
   constructor() {
-    this.dynamiteCount = 0;
+    this.myDynamiteCount = 0;
+    this.theirDynamiteCount = 0;
   }
 
   makeMove(gamestate) {
-    const random = this.getRandomNumber();
+    this.updateDynamiteCounts(gamestate);
+    const moves = this.getMoves();
+    return this.selectMove(moves);
+  }
 
-    switch (random) {
-      case 1:
-        return 'R';
-        break;
-      case 2:
-        return 'P';
-        break;
-      case 3:
-        return 'S';
-        break;
-      case 4:
-        return 'W';
-        break;
-      case 5:
-        return 'D';
-        break;
+  getMoves() {
+    let moves = ['R', 'P', 'S'];
+    if (this.iHaveDynamites()) {
+      if (this.theyHaveDynamites()) {
+        moves.push('D');
+        moves.push('W');
+      } else {
+        moves.push('D');
+      }
+    } else {
+      if (this.theyHaveDynamites()) {
+        moves.push('W');
+      }
+    }
+    return moves;
+  }
+
+  selectMove(moves) {
+    const length = moves.length;
+    const random = Math.floor((Math.random() * length));
+    return moves[random];
+  }
+
+  updateDynamiteCounts(gamestate) {
+    var round = gamestate.rounds.length - 1;
+    if (round >= 0) {
+      if (gamestate.rounds[round].p1 === 'D') {
+        this.myDynamiteCount++;
+      }
+
+      if (gamestate.rounds[round].p2 === 'D') {
+        this.theirDynamiteCount++;
+      }
     }
   }
 
-  getRandomNumber() {
-    const random = Math.floor((Math.random() * 5) + 1);
-    if (random === 5 && this.dynamiteCount < 100) {
-      this.dynamiteCount++;
-      return random;
-    } else if (random === 5 && this.dynamiteCount >= 100) {
-      return Math.floor((Math.random() * 4) + 1);
-    } else {
-      return random;
-    }
+  iHaveDynamites() {
+    return this.myDynamiteCount < 100 === true;
+  }
+
+  theyHaveDynamites() {
+    return this.theirDynamiteCount < 100 === true;
   }
 }
 
